@@ -39,7 +39,7 @@ def connect():
         )
 
         if verbose:
-            print(colored("[+] Connecting to the database...", "blue"))
+            print(colored("[+] Connecting to the database...", "green"))
         cur = conn.cursor()
         conn.set_session(readonly=True, autocommit=True)
         cur.execute(f"SELECT ci.NAME_VALUE NAME_VALUE FROM certificate_identity ci WHERE ci.NAME_TYPE = 'dNSName' AND reverse(lower(ci.NAME_VALUE)) LIKE reverse(lower('%.{domain}'));")
@@ -57,7 +57,7 @@ def connect():
         if conn is not None:
             conn.close()
         if verbose:
-            print(colored("[+] Database connection closed...", "blue"))
+            print(colored("[+] Database connection closed...", "yellow"))
         return domains
 
 def main():
@@ -67,7 +67,10 @@ def main():
     msg_buffer = []
 
     if not os.path.exists(home + "old.txt"):
-        os.makedirs(home)
+        try:
+            os.makedirs(home)
+        except FileExistsError:
+            pass
         print(colored("[+] Initial run detected...", "green"))
         print(colored("[+] Creating files...", "green"))
         print(colored("[+] Done...", "green"))
@@ -78,13 +81,14 @@ def main():
                 for y in x:
                     f.write(f"{y}\n")
     else:
-        print(colored("[+] `old.txt` detected...", "green"))
+        # Check for new subdomains
         print(colored("[+] Checking for new subdomains...", "green"))
         domains = connect()
         for x in domains:
             for y in x:
                 new.append(y)
 
+        # Check for differences
         with open(home + "old.txt", "r") as f:
             for x in f:
                 old.append(x.strip())
@@ -117,7 +121,7 @@ def main():
                                    <html>
                                    <body>
                                    <div>
-                                   <h2>
+                                   <h3>
                                    <ul>
                                    """)
                         for dom in msg_buffer:
@@ -126,11 +130,12 @@ def main():
                                        """)
                         html.write("""
                                    </ul>
-                                   </h2>
+                                   </h3>
                                    </div>
                                    </body>
                                    </html>
                                    """)
+                    # Send email
                     with open(home + "email.html", "r") as f:
                         print(colored("[+] New domain(s) detected...", "yellow"))
                         print(colored("[+] Sending email...", "yellow"))
@@ -147,6 +152,10 @@ def main():
                             server.send_message(msg)
                             server.quit()
                             print(colored("[+] Done...", "green"))
+                            # Write new subdomain list to old.txt
+                            with open(home + "old.txt", "w") as f:
+                                for x in new:
+                                    f.write(f"{y}\n")
                 except smtplib.SMTPAuthenticationError:
                     print(colored("[!] Failed to login...", "red"))
                     print(colored("[!] Please check your email and credentials...", "red"))
