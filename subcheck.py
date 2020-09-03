@@ -88,78 +88,78 @@ def main():
             for y in x:
                 new.append(y)
 
-        # Check for differences
         with open(home + "old.txt", "r") as f:
             for x in f:
                 old.append(x.strip())
 
-            diff = difflib.unified_diff(
-                old,
-                new,
-                fromfile='old.txt',
-                tofile='new.txt',
-                lineterm=''
-            )
+        # Check for differences
+        diff = difflib.unified_diff(
+            old,
+            new,
+            fromfile='old.txt',
+            tofile='new.txt',
+            lineterm=''
+        )
 
-            # Check for new subdomains
-            for dom in diff:
-                if dom.startswith("+++ new.txt"):
-                    continue
-                elif dom.startswith("+"):
-                    print(colored("[+] New domain detected:", "blue") + colored(f" {dom[1:]}", "yellow"))
-                    msg_buffer.append(dom[1:])
+        # Check for new subdomains
+        for dom in diff:
+            if dom.startswith("+++ new.txt"):
+                continue
+            elif dom.startswith("+"):
+                print(colored("[+] New domain detected:", "blue") + colored(f" {dom[1:]}", "yellow"))
+                msg_buffer.append(dom[1:])
 
-            # Send email if msg_buffer is not empty
-            if not msg_buffer:
-                    print(colored("[+] No new domains...", "red"))
-            else:
-                try:
-                    # Create the HTML file to be sent via email
-                    with open(home + "email.html", "w") as html:
-                        html.write("""
-                                   <!DOCTYPE html>
-                                   <html>
-                                   <body>
-                                   <div>
-                                   <h3>
-                                   <ul>
+        # Send email if msg_buffer is not empty
+        if not msg_buffer:
+                print(colored("[+] No new domains...", "red"))
+        else:
+            try:
+                # Create the HTML file to be sent via email
+                with open(home + "email.html", "w") as html:
+                    html.write("""
+                               <!DOCTYPE html>
+                               <html>
+                               <body>
+                               <div>
+                               <h3>
+                               <ul>
+                               """)
+                    for dom in msg_buffer:
+                        html.write(f"""
+                                   <li>{dom}</li>
                                    """)
-                        for dom in msg_buffer:
-                            html.write(f"""
-                                       <li>{dom}</li>
-                                       """)
-                        html.write("""
-                                   </ul>
-                                   </h3>
-                                   </div>
-                                   </body>
-                                   </html>
-                                   """)
-                    # Send email
-                    with open(home + "email.html", "r") as f:
-                        print(colored("[+] New domain(s) detected...", "yellow"))
-                        print(colored("[+] Sending email...", "yellow"))
-                        html = f.read()
-                        msg  = MIMEMultipart("alternative")
-                        msg["Subject"] = f"New subdomain(s) detected for: {domain}"
-                        msg["From"]    = f"{email}"
-                        msg["To"]      = f"{recipient}"
-                        mime = MIMEText(html, "html")
-                        msg.attach(mime)
-                        with smtplib.SMTP_SSL("smtp.gmail.com", port) as server:
-                            server.ehlo()
-                            server.login(email, passw)
-                            server.send_message(msg)
-                            server.quit()
-                            print(colored("[+] Done...", "green"))
-                            # Write new subdomain list to old.txt
-                            with open(home + "old.txt", "w") as f:
-                                for x in new:
-                                    f.write(f"{y}\n")
-                except smtplib.SMTPAuthenticationError:
-                    print(colored("[!] Failed to login...", "red"))
-                    print(colored("[!] Please check your email and credentials...", "red"))
-                    sys.exit(1)
+                    html.write("""
+                               </ul>
+                               </h3>
+                               </div>
+                               </body>
+                               </html>
+                               """)
+                # Send email
+                with open(home + "email.html", "r") as f:
+                    print(colored("[+] New domain(s) detected...", "yellow"))
+                    print(colored("[+] Sending email...", "yellow"))
+                    html = f.read()
+                    msg  = MIMEMultipart("alternative")
+                    msg["Subject"] = f"New subdomain(s) detected for: {domain}"
+                    msg["From"]    = f"{email}"
+                    msg["To"]      = f"{recipient}"
+                    mime = MIMEText(html, "html")
+                    msg.attach(mime)
+                    with smtplib.SMTP_SSL("smtp.gmail.com", port) as server:
+                        server.ehlo()
+                        server.login(email, passw)
+                        server.send_message(msg)
+                        server.quit()
+                        print(colored("[+] Done...", "green"))
+                        # Write new subdomain list to old.txt
+                        with open(home + "old.txt", "w") as f:
+                            for x in new:
+                                f.write(f"{x}\n")
+            except smtplib.SMTPAuthenticationError:
+                print(colored("[!] Failed to login...", "red"))
+                print(colored("[!] Please check your email and credentials...", "red"))
+                sys.exit(1)
 
     return 0
 
