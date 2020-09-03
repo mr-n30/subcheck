@@ -1,5 +1,5 @@
 # SubCheck
-A program to check for new subdomains added to a company
+A program to check for newly added subdomains
 
 ## Installation:
 ```bash
