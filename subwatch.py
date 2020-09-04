@@ -25,7 +25,7 @@ passw     = args.password
 domain    = args.domain
 verbose   = args.verbose
 recipient = args.recipient
-home      = str(Path.home()) + f"/.subcheck/{domain}/"
+home      = str(Path.home()) + f"/.subwatch/{domain}/"
 
 def connect():
     conn      = None
