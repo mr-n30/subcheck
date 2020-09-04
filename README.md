@@ -1,4 +1,4 @@
-# SubCheck
+# Subwatch
 A program to check for newly added subdomains
 
 ## Installation:
