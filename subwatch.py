@@ -11,6 +11,17 @@ from email.message import EmailMessage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
+print(r"""
+
+      ███████╗██╗   ██╗██████╗ ██╗    ██╗ █████╗ ████████╗ ██████╗██╗  ██╗
+      ██╔════╝██║   ██║██╔══██╗██║    ██║██╔══██╗╚══██╔══╝██╔════╝██║  ██║
+      ███████╗██║   ██║██████╔╝██║ █╗ ██║███████║   ██║   ██║     ███████║
+      ╚════██║██║   ██║██╔══██╗██║███╗██║██╔══██║   ██║   ██║     ██╔══██║
+      ███████║╚██████╔╝██████╔╝╚███╔███╔╝██║  ██║   ██║   ╚██████╗██║  ██║
+      ╚══════╝ ╚═════╝ ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚═╝
+
+      """)
+
 parser = argparse.ArgumentParser(description="Check if new subdomains have been added")
 parser.add_argument("-e", "--email", type=str, help="Your Gmail", required=True)
 parser.add_argument("-p", "--password", type=str, help="Your Gmail password", required=True)
@@ -183,7 +194,6 @@ def connect():
 
 def main():
     connect()
-
     return 0
 
 if __name__ == "__main__":
