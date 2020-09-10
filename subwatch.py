@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import time
 import difflib
 import smtplib
 import argparse
@@ -89,7 +90,7 @@ def connect():
                         # when finished
                         domains = []
                         print(colored("[+] Done...", "green"))
-                        print(colored("[+] We'll notify you when a new subdomain(s) is detected...", "green"))
+                        print(colored("[+] We'll notify you when new subdomain(s) are detected...", "green"))
                 else:
                     print(colored("[+] Checking for new subdomains: ", "green") + colored(f"{domain.strip()}", "yellow"))
                     cur.execute(f"SELECT ci.NAME_VALUE NAME_VALUE FROM certificate_identity ci WHERE ci.NAME_TYPE = 'dNSName' AND reverse(lower(ci.NAME_VALUE)) LIKE reverse(lower('%.{domain.strip()}'));")
@@ -103,7 +104,7 @@ def connect():
                             if "*" in y or "?" in y:
                                 pass
                             else:
-                                new.append(y)
+                                new.append(y.lower())
                     with open(home + "old.txt", "r") as o:
                         for x in o:
                             old.append(x.strip())
