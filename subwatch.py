@@ -70,15 +70,15 @@ def connect():
                         domains.sort()
                         for x in domains:
                             for y in x:
-                                if "*" in y:
+                                if "*" in y or "?" in y:
                                     pass
                                 else:
-                                    o.write(f"{y}\n")
+                                    o.write(f"{y.lower()}\n")
                         # Clear out domains buffer
                         # when finished
                         domains = []
                         print(colored("[+] Done...", "green"))
-                        print(colored("[+] We'll notify you when a new subdomain is detected...", "green"))
+                        print(colored("[+] We'll notify you when a new subdomain(s) is detected...", "green"))
                 else:
                     print(colored("[+] Checking for new subdomains: ", "green") + colored(f"{domain.strip()}", "yellow"))
                     cur.execute(f"SELECT ci.NAME_VALUE NAME_VALUE FROM certificate_identity ci WHERE ci.NAME_TYPE = 'dNSName' AND reverse(lower(ci.NAME_VALUE)) LIKE reverse(lower('%.{domain.strip()}'));")
@@ -89,7 +89,7 @@ def connect():
                     # Load fresh set of domains from DB
                     for x in domains:
                         for y in x:
-                            if "*" in y:
+                            if "*" in y or "?" in y:
                                 pass
                             else:
                                 new.append(y)
@@ -112,6 +112,7 @@ def connect():
                             msg_buffer.append(dom[1:])
                     # Send email if msg_buffer is not empty
                     if not msg_buffer:
+                        # Would be nice to put a time stamp here
                         print(colored("[+] No new domains...", "red"))
                     else:
                         try:
@@ -156,7 +157,7 @@ def connect():
                                     # Write new subdomain(s) to old.txt
                                     with open(home + "old.txt", "w") as o:
                                         for x in new:
-                                            o.write(f"{x}\n")
+                                            o.write(f"{x.lower()}\n")
                         except smtplib.SMTPAuthenticationError:
                             print(colored("[!] Failed to login...", "red"))
                             print(colored("[!] Please check your email and credentials...", "red"))
